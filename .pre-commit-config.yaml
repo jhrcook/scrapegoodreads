@@ -42,3 +42,13 @@ repos:
     hooks:
     -   id: flake8
         types: [python]
+
+-   repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.2.3
+    hooks:
+    -   id: nbqa-isort
+        args: ["--profile=black"]
+    -   id: nbqa-black
+    -   id: nbqa-flake8
+    -   id: nbqa-mypy
+        additional_dependencies: [pydantic, mypy, types-python-dateutil, types-PyYAML]
