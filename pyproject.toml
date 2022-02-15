@@ -4,10 +4,23 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "scrapegoodreads"
-authors = [{name = "Joshua Cook", email = "joshuacook0023@gmail.com"}]
-license = {file = "LICENSE"}
-classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
+authors = [{ name = "Joshua Cook", email = "joshuacook0023@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
 dynamic = ["version", "description"]
+dependencies = [
+    "requests >=2.27",
+    "beautifulsoup4 >=4.10",
+    "pydantic >=1.9",
+    "selenium >=4.1",
+]
 
 [project.urls]
 Home = "https://github.com/jhrcook/scrape-goodreads"
+Source = "https://github.com/jhrcook/scrape-goodreads"
+
+[project.optional-dependencies]
+dev = ["black", "flake8", "mypy", "types-requests", "pytest", "pytest-cov"]
+explore = ["jupyterlab"]
