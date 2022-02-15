@@ -50,5 +50,6 @@ repos:
         args: ["--profile=black"]
     -   id: nbqa-black
     -   id: nbqa-flake8
+        args: ["--extend-ignore=E402"]
     -   id: nbqa-mypy
-        additional_dependencies: [pydantic, mypy, types-python-dateutil, types-PyYAML]
+        additional_dependencies: [pydantic, mypy, types-python-dateutil, types-PyYAML, types-requests]
