@@ -5,15 +5,17 @@ import time
 from datetime import date, datetime
 from typing import Any, Optional
 
+import requests
 from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel
-from selenium import webdriver
+from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 
 from scrapegoodreads import GOODREADS_URLS
 from scrapegoodreads.exceptions import (
     InfiniteScrollBottomNotFound,
     UnknownDateFormatException,
 )
+from scrapegoodreads.webscraping_helpers import WebRequestMethod, headless_chrome_driver
 
 
 class BookData(BaseModel):
@@ -119,40 +121,14 @@ def _infinite_scroll_status(soup: BeautifulSoup) -> tuple[int, int]:
     return (nums[0], nums[1])
 
 
-def _make_driver() -> webdriver.Chrome:
-    opts = webdriver.ChromeOptions()
-    opts.binary_location = (
-        "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
-    )
-    driver_path = "/usr/local/bin/chromedriver"
-    opts.add_argument("--headless")
-    driver = webdriver.Chrome(options=opts, executable_path=driver_path)
-    return driver
-
-
-# TODO: make option for which webdriver to use.
-
-
-def beautiful_book_list(
-    user_id: str, max_scrolls: int = 50, sleep_time: float = 2.0
+def _beautiful_book_list_infinite_scroll(
+    url: str,
+    driver: Optional[RemoteWebDriver] = None,
+    max_scrolls: int = 50,
+    sleep_time: float = 2.0,
 ) -> BeautifulSoup:
-    """Get and parse the HTML for a Goodreads book shelf.
-
-    Args:
-        user_id (str): Goodreads user ID.
-        max_scrolls (int, optional): Maximum number of scrolls for the infinite scroll
-        of the webpage. Defaults to 50.
-        sleep_time (float, optional): Delay between each scroll. Defaults to 2.0.
-
-    Raises:
-        InfiniteScrollBottomNotFound: If the bottom of the list is not reached.
-
-    Returns:
-        BeautifulSoup: The webpage of a book shelf after scrolling all the way to the
-        bottom.
-    """
-    url = GOODREADS_URLS["list"] + user_id
-    driver = _make_driver()
+    if driver is None:
+        driver = headless_chrome_driver()
     driver.get(url)
     for _ in range(max_scrolls):
         driver.execute_script("window.scrollTo(1,50000)")
@@ -162,6 +138,44 @@ def beautiful_book_list(
             return soup
         time.sleep(sleep_time)
     raise InfiniteScrollBottomNotFound("Try increasing maximum scrolls.")
+
+
+def _beautiful_book_list_requests(url: str) -> BeautifulSoup:
+    res = requests.get(url)
+    res.raise_for_status()
+    return BeautifulSoup(res.content)
+
+
+def beautiful_book_list(
+    user_id: str,
+    method: WebRequestMethod,
+    driver: Optional[RemoteWebDriver] = None,
+    max_scrolls: int = 50,
+    sleep_time: float = 2.0,
+) -> BeautifulSoup:
+    """Get and parse the HTML for a Goodreads book shelf.
+
+    Args:
+        user_id (str): Goodreads user ID.
+        method (WebRequestMethod): Request method.
+        driver (Optional[RemoteWebDriver], optional): Web driver object. If `None`
+        (default) then a default web-driver will be used. Only used
+        if `method=WebRequestMethod.SELENIUM`.
+        max_scrolls (int, optional): Maximum number of scrolls for the infinite scroll
+        of the webpage. Defaults to 50. Only used if `method=WebRequestMethod.SELENIUM`.
+        sleep_time (float, optional): Delay between each scroll. Defaults to 2.0. Only
+        used if `method=WebRequestMethod.SELENIUM`.
+
+    Returns:
+        BeautifulSoup: The webpage of a book shelf (list).
+    """
+    url = GOODREADS_URLS["list"] + user_id
+    if method is WebRequestMethod.REQUESTS:
+        return _beautiful_book_list_requests(url=url)
+    elif method is WebRequestMethod.SELENIUM:
+        return _beautiful_book_list_infinite_scroll(
+            url=url, driver=driver, max_scrolls=max_scrolls, sleep_time=sleep_time
+        )
 
 
 def parse_book_shelf(books_soup: BeautifulSoup) -> list[BookData]:
