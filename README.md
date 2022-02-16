@@ -4,8 +4,8 @@
 
 ## To-Do
 
-- feat: choice of webdrivers or just use requests and get the top
 - doc: note use of selenium in documentation
+- doc: add examples of current features
 - feat: get reading activity from Goodreads
 
 ## Features

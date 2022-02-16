@@ -15,7 +15,11 @@ from scrapegoodreads.exceptions import (
     InfiniteScrollBottomNotFound,
     UnknownDateFormatException,
 )
-from scrapegoodreads.webscraping_helpers import WebRequestMethod, headless_chrome_driver
+from scrapegoodreads.webscraping_helpers import (
+    ParamsDict,
+    WebRequestMethod,
+    headless_chrome_driver,
+)
 
 
 class BookData(BaseModel):
@@ -124,12 +128,14 @@ def _infinite_scroll_status(soup: BeautifulSoup) -> tuple[int, int]:
 def _beautiful_book_list_infinite_scroll(
     url: str,
     driver: Optional[RemoteWebDriver] = None,
+    params: Optional[ParamsDict] = None,
     max_scrolls: int = 50,
     sleep_time: float = 2.0,
 ) -> BeautifulSoup:
     if driver is None:
         driver = headless_chrome_driver()
-    driver.get(url)
+    res = requests.get(url=url, params=params)
+    driver.get(res.request.url)
     for _ in range(max_scrolls):
         driver.execute_script("window.scrollTo(1,50000)")
         soup = BeautifulSoup(driver.page_source, "html.parser")
@@ -140,8 +146,10 @@ def _beautiful_book_list_infinite_scroll(
     raise InfiniteScrollBottomNotFound("Try increasing maximum scrolls.")
 
 
-def _beautiful_book_list_requests(url: str) -> BeautifulSoup:
-    res = requests.get(url)
+def _beautiful_book_list_requests(
+    url: str, params: Optional[ParamsDict] = None
+) -> BeautifulSoup:
+    res = requests.get(url, params=params)
     res.raise_for_status()
     return BeautifulSoup(res.content)
 
@@ -149,6 +157,7 @@ def _beautiful_book_list_requests(url: str) -> BeautifulSoup:
 def beautiful_book_list(
     user_id: str,
     method: WebRequestMethod,
+    shelf: Optional[str] = None,
     driver: Optional[RemoteWebDriver] = None,
     max_scrolls: int = 50,
     sleep_time: float = 2.0,
@@ -158,6 +167,7 @@ def beautiful_book_list(
     Args:
         user_id (str): Goodreads user ID.
         method (WebRequestMethod): Request method.
+        shelf (Optional[str], optional): User's shelf to scrape. Defaults to `None`.
         driver (Optional[RemoteWebDriver], optional): Web driver object. If `None`
         (default) then a default web-driver will be used. Only used
         if `method=WebRequestMethod.SELENIUM`.
@@ -170,11 +180,17 @@ def beautiful_book_list(
         BeautifulSoup: The webpage of a book shelf (list).
     """
     url = GOODREADS_URLS["list"] + user_id
+    params: ParamsDict = {"shelf": shelf}
+
     if method is WebRequestMethod.REQUESTS:
-        return _beautiful_book_list_requests(url=url)
+        return _beautiful_book_list_requests(url=url, params=params)
     elif method is WebRequestMethod.SELENIUM:
         return _beautiful_book_list_infinite_scroll(
-            url=url, driver=driver, max_scrolls=max_scrolls, sleep_time=sleep_time
+            url=url,
+            params=params,
+            driver=driver,
+            max_scrolls=max_scrolls,
+            sleep_time=sleep_time,
         )
 
 

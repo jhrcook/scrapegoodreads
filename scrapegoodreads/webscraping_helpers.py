@@ -1,9 +1,11 @@
 """General utilities and helpers."""
 
-
 from enum import Enum
+from typing import Union
 
 from selenium import webdriver
+
+ParamsDict = dict[str, Union[None, str, float, bool]]
 
 
 class WebRequestMethod(Enum):

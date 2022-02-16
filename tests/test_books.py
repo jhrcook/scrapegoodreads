@@ -17,3 +17,11 @@ def test_error_if_not_scrolled_far_enough(jhc_user_id: str) -> None:
         _ = books.beautiful_book_list(
             user_id=jhc_user_id, method=WebRequestMethod.SELENIUM, max_scrolls=2
         )
+
+
+def test_get_books_from_specific_shelf(jhc_user_id: str) -> None:
+    book_soup = books.beautiful_book_list(
+        user_id=jhc_user_id, method=WebRequestMethod.REQUESTS, shelf="greats"
+    )
+    book_list = books.parse_book_shelf(book_soup)
+    assert len(book_list) > 5
