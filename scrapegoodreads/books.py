@@ -39,7 +39,6 @@ class BookData(BaseModel):
     date_pub: Optional[date]
     date_pub_edition: Optional[date]
     rating: Optional[int]
-    # shelves
 
 
 def _search_table_row_td(tr: Tag, class_: str, find: str) -> Tag:
@@ -110,6 +109,7 @@ def parse_book_table_row(tr: Tag) -> BookData:
         d = _get_table_row_td_value(tr, class_=f"field {field}")
         _data[field] = _parse_dates(d)
 
+    # Rating
     rating_info = tr.find("td", "field rating")
     if rating_info is None:
         raise ValueError("Could not find rating information.")
@@ -151,12 +151,12 @@ def _beautiful_book_list_requests(
 ) -> BeautifulSoup:
     res = requests.get(url, params=params)
     res.raise_for_status()
-    return BeautifulSoup(res.content)
+    return BeautifulSoup(res.content, "html.parser")
 
 
 def beautiful_book_list(
     user_id: str,
-    method: WebRequestMethod,
+    method: WebRequestMethod = WebRequestMethod.SELENIUM,
     shelf: Optional[str] = None,
     driver: Optional[RemoteWebDriver] = None,
     max_scrolls: int = 50,
