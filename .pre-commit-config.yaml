@@ -43,6 +43,14 @@ repos:
     -   id: flake8
         types: [python]
 
+-   repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.1.1
+    hooks:
+    -   id: pydocstyle
+        types: [python]
+        files: "speclet/.*"
+        args: ["--convention", "google", "--add-ignore", "D301"]
+
 -   repo: https://github.com/nbQA-dev/nbQA
     rev: 1.2.3
     hooks:

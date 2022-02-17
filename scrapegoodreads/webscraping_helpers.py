@@ -16,6 +16,14 @@ class WebRequestMethod(Enum):
 
 
 def headless_chrome_driver() -> webdriver.Chrome:
+    """Create a headless chromium web driver.
+
+    # TODO: figure out way of letting user set the default.
+    # Cannot have Brave be the default...
+
+    Returns:
+        webdriver.Chrome: Headless chromium web driver.
+    """
     opts = webdriver.ChromeOptions()
     opts.binary_location = (
         "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
