@@ -1,13 +1,31 @@
 # A web scraping tool for Goodreads
 
-**Just focus on features that I want.**
+**A Python library for scraping data from [Goodreads](https://www.goodreads.com).**
+
+[![goodreads](https://img.shields.io/badge/scrape-Goodreads-372213.svg?style=flat&logo=goodreads&logoColor=#262626)](https://www.goodreads.com)
+[![python](https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+
+> I built this package to serve my own needs.
+> It's primary goal is to get data I'm interested in retrieving into a standardized and usable format.
+> It is *not* comprehensive, so if there are missing features you would like to include please either make the changes in a PR or open a [feature request](https://github.com/jhrcook/scrapegoodreads/issues).
 
 ## To-Do
 
-- doc: note use of selenium in documentation
-- doc: layout general idea of the package and that it is relatively simple and features are added as I want them
-  - main point is to get the data into your hands
+- doc: update examples with new driver API
 - feat: get reading activity from Goodreads
+- test: GitHub CI
+
+## Install
+
+```bash
+pip install git+https://github.com/jhrcook/scrapegoodreads.git
+```
+
+This library uses ['selenium'](https://pypi.org/project/selenium/) so make sure that you have one of the supported web browsers installed to use those features.
+I have tried to include documentation about how to use the web drivers, but please open an [Issue](https://github.com/jhrcook/scrapegoodreads/issues) if you have any questions or run into problems.
 
 ## Features
 
