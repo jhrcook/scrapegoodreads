@@ -1,4 +1,4 @@
-# A webscraping tool for Goodreads
+# A web scraping tool for Goodreads
 
 **Just focus on features that I want.**
 
@@ -7,7 +7,6 @@
 - doc: note use of selenium in documentation
 - doc: layout general idea of the package and that it is relatively simple and features are added as I want them
   - main point is to get the data into your hands
-- feat: see TODO in `webscraping-helpers` module
 - feat: get reading activity from Goodreads
 
 ## Features

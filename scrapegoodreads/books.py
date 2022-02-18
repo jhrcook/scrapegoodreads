@@ -3,7 +3,7 @@
 import re
 import time
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -15,10 +15,13 @@ from scrapegoodreads.exceptions import (
     InfiniteScrollBottomNotFound,
     UnknownDateFormatException,
 )
+from scrapegoodreads.utils import assert_never
 from scrapegoodreads.webscraping_helpers import (
+    BuiltinWebDriver,
     ParamsDict,
     WebRequestMethod,
     headless_chrome_driver,
+    make_builtin_driver,
 )
 
 
@@ -158,40 +161,48 @@ def beautiful_book_list(
     user_id: str,
     method: WebRequestMethod = WebRequestMethod.SELENIUM,
     shelf: Optional[str] = None,
-    driver: Optional[RemoteWebDriver] = None,
+    driver: Optional[Union[RemoteWebDriver, BuiltinWebDriver]] = None,
     max_scrolls: int = 50,
     sleep_time: float = 2.0,
-) -> BeautifulSoup:
+) -> tuple[BeautifulSoup, Optional[RemoteWebDriver]]:
     """Get and parse the HTML for a Goodreads book shelf.
 
     Args:
         user_id (str): Goodreads user ID.
         method (WebRequestMethod): Request method.
         shelf (Optional[str], optional): User's shelf to scrape. Defaults to `None`.
-        driver (Optional[RemoteWebDriver], optional): Web driver object. If `None`
-        (default) then a default web-driver will be used. Only used
-        if `method=WebRequestMethod.SELENIUM`.
+        driver (Optional[Union[RemoteWebDriver, BuiltinWebDriver]], optional): Web
+        driver object or a choice of one of the supported built-in drivers. Only used
+        if `method=WebRequestMethod.SELENIUM`. Defaults to `None`.
         max_scrolls (int, optional): Maximum number of scrolls for the infinite scroll
         of the webpage. Defaults to 50. Only used if `method=WebRequestMethod.SELENIUM`.
         sleep_time (float, optional): Delay between each scroll. Defaults to 2.0. Only
         used if `method=WebRequestMethod.SELENIUM`.
 
     Returns:
-        BeautifulSoup: The webpage of a book shelf (list).
+        tuple[BeautifulSoup, Optional[RemoteWebDriver]]: The webpage of a book shelf
+        (i.e. book list) and the selenium web driver, if applicable.
     """
     url = GOODREADS_URLS["list"] + user_id
     params: ParamsDict = {"shelf": shelf}
 
     if method is WebRequestMethod.REQUESTS:
-        return _beautiful_book_list_requests(url=url, params=params)
+        return _beautiful_book_list_requests(url=url, params=params), None
     elif method is WebRequestMethod.SELENIUM:
-        return _beautiful_book_list_infinite_scroll(
+        if driver is None:
+            raise ValueError("A driver must be supplied to use 'selenium'.")
+        elif isinstance(driver, BuiltinWebDriver):
+            driver = make_builtin_driver(driver)
+        res = _beautiful_book_list_infinite_scroll(
             url=url,
             params=params,
             driver=driver,
             max_scrolls=max_scrolls,
             sleep_time=sleep_time,
         )
+        return res, driver
+    else:
+        assert_never(method)
 
 
 def parse_book_shelf(books_soup: BeautifulSoup) -> list[BookData]:

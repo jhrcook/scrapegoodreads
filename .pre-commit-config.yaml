@@ -61,3 +61,8 @@ repos:
         args: ["--extend-ignore=E402"]
     -   id: nbqa-mypy
         additional_dependencies: [pydantic, mypy, types-python-dateutil, types-PyYAML, types-requests]
+
+-   repo: https://github.com/MarcoGorelli/check-execution-order
+    rev: v0.1.1
+    hooks:
+    -   id: check-execution-order
