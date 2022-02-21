@@ -65,18 +65,31 @@ def _chrome_driver_path() -> str:
     return _check_path(chrome_path, env_var=env_var, name="chrome driver")
 
 
+def brave_driver(headless: bool = False) -> webdriver.Chrome:
+    """Create a Brave web driver.
+
+    Args:
+        headless (bool, optional): Create headless driver? Defaults to False.
+
+    Returns:
+        webdriver.Chrome: Brave web driver.
+    """
+    opts = webdriver.ChromeOptions()
+    opts.binary_location = _brave_app_location()
+    driver_path = _chrome_driver_path()
+    if headless:
+        opts.add_argument("--headless")
+    driver = webdriver.Chrome(options=opts, executable_path=driver_path)
+    return driver
+
+
 def headless_brave_driver() -> webdriver.Chrome:
     """Create a headless Brave (chromium) web driver.
 
     Returns:
         webdriver.Chrome: Headless chromium web driver.
     """
-    opts = webdriver.ChromeOptions()
-    opts.binary_location = _brave_app_location()
-    driver_path = _chrome_driver_path()
-    opts.add_argument("--headless")
-    driver = webdriver.Chrome(options=opts, executable_path=driver_path)
-    return driver
+    return brave_driver(headless=True)
 
 
 def safari_driver() -> webdriver.Safari:
