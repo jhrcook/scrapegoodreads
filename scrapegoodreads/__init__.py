@@ -2,7 +2,7 @@
 
 from typing import Final
 
-__version__ = "0.0.0.9000"
+__version__: Final[str] = "0.0.0.9000"
 
 GOODREADS_BASE_URL: Final[str] = "https://www.goodreads.com"
 
