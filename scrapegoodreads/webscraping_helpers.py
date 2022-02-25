@@ -18,16 +18,29 @@ class WebRequestMethod(Enum):
     SELENIUM = "SELENIUM"
 
 
+def chrome_driver(headless: bool = False) -> webdriver.Chrome:
+    """Create a Chrome web driver.
+
+    Args:
+        headless (bool, optional): Create headless driver? Defaults to False.
+
+    Returns:
+        webdriver.Chrome: Chrome web driver.
+    """
+    opts = webdriver.ChromeOptions()
+    if headless:
+        opts.add_argument("--headless")
+    driver = webdriver.Chrome(options=opts)
+    return driver
+
+
 def headless_chrome_driver() -> webdriver.Chrome:
     """Create a headless Chrome web driver.
 
     Returns:
         webdriver.Chrome: Headless chromium web driver.
     """
-    opts = webdriver.ChromeOptions()
-    opts.add_argument("--headless")
-    driver = webdriver.Chrome(options=opts)
-    return driver
+    return chrome_driver(headless=True)
 
 
 def _search_env_and_some_default_locations(
@@ -106,6 +119,8 @@ class BuiltinWebDriver(Enum):
 
     HEADLESS_CHROME = "HEADLESS_CHROME"
     HEADLESS_BRAVE = "HEADLESS_BRAVE"
+    CHROME = "CHROME"
+    BRAVE = "BRAVE"
     SAFARI = "SAFARI"
 
 
@@ -121,6 +136,8 @@ def make_builtin_driver(opt: BuiltinWebDriver) -> RemoteWebDriver:
     _driver_lookup: Final[dict[BuiltinWebDriver, Callable[[], RemoteWebDriver]]] = {
         BuiltinWebDriver.HEADLESS_CHROME: headless_chrome_driver,
         BuiltinWebDriver.HEADLESS_BRAVE: headless_brave_driver,
+        BuiltinWebDriver.CHROME: chrome_driver,
+        BuiltinWebDriver.BRAVE: brave_driver,
         BuiltinWebDriver.SAFARI: safari_driver,
     }
     return _driver_lookup[opt]()
