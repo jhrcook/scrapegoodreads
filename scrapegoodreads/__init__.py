@@ -13,4 +13,5 @@ GOODREADS_BASE_URL: Final[str] = "https://www.goodreads.com"
 GOODREADS_URLS: Final[dict[str, str]] = {
     "user": GOODREADS_BASE_URL + "/user/show/",
     "list": GOODREADS_BASE_URL + "/review/list/",
+    "sign-in": GOODREADS_BASE_URL + "/user/sign_in",
 }

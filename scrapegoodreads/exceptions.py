@@ -11,3 +11,9 @@ class UnknownDateFormatException(BaseException):
     """Unknown date format."""
 
     ...
+
+
+class InputException(BaseException):
+    """Input exception."""
+
+    ...

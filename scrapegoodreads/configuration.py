@@ -14,7 +14,8 @@ from scrapegoodreads.webscraping_helpers import BuiltinWebDriver
 class Configuration(BaseModel):
     """Goodreads web scraping interface configuration."""
 
-    user_id: Optional[str] = None
+    user_id: str
+    user_email: str
     driver: Optional[BuiltinWebDriver] = None
 
 
@@ -24,7 +25,7 @@ def read_config(config_path: Path) -> Configuration:
     return Configuration(**data)
 
 
-DEFAULT_CONFIG_PATHS = ["grscrape.yaml"]
+DEFAULT_CONFIG_PATHS = ["grscrape.yaml", "grscrape.yml"]
 SEARCH_LOCATIONS: set[Optional[str]] = {".", os.getenv("HOME")}
 
 
