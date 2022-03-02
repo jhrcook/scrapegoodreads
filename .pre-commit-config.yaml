@@ -22,7 +22,7 @@ repos:
     rev: v0.931
     hooks:
     -   id: mypy
-        additional_dependencies: [pydantic, types-PyYAML, types-python-dateutil, types-requests]
+        additional_dependencies: [pydantic, types-PyYAML, types-python-dateutil, types-requests, types-bleach]
 
 -   repo: https://github.com/psf/black
     rev: 22.1.0
